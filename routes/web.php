@@ -21,3 +21,5 @@ Route::get('/', [HomeController::class, 'index'])
 
 Route::get('/pages/{name}', [HomeController::class, 'show'])
     ->name('pages');
+
+Route::view('/dashboard', 'layouts.dashboard');
