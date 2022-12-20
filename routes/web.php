@@ -23,5 +23,16 @@ Route::get('/', [HomeController::class, 'index'])
 Route::get('/pages/{name}', [HomeController::class, 'show'])
     ->name('pages');
 
-Route::get('/dashboard/categories', [CategoriesController::class, 'index'])
-    ->name('dashboard.categories.index');
+Route::group([
+    'prefix' => '/dashboard/categories',
+    'as' => 'dashboard.categories.',
+    'controller' => CategoriesController::class, // Laravel 9
+], function() {
+    Route::get('/', 'index')->name('index');
+    Route::get('/create', 'create')->name('create');
+    Route::post('/', 'store')->name('store');
+
+    Route::get('/{category}/edit', 'edit')->name('edit');
+    Route::match(['put', 'patch'], '/{category}', 'update')->name('update');
+    Route::delete('/{category}', 'destroy')->name('destroy');
+});
