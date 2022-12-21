@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\CategoryRequest;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Str;
 
 class CategoriesController extends Controller
 {
@@ -28,20 +31,26 @@ class CategoriesController extends Controller
 
         return view('dashboard.categories.index', [
             'categories' => $categories,
-            'status' => session('status'),
         ]);
     }
 
     public function create()
     {
-        $parents = Category::orderBy('name')->get();
+        $parents = Category::orderBy('name')->pluck('name', 'id');
+
         return view('dashboard.categories.create', [
+            'category' => new Category(),
             'parents' => $parents,
         ]);
     }
 
     public function store(Request $request)
     {
+        $data = $this->validateRequest($request);
+        if (!$data['slug']) {
+            $data['slug'] = Str::slug($data['name']);
+        }
+
         // $category = new Category($request->all());
         // $category->name = $request->name;
         // $category->slug = $request->input('slug');
@@ -49,12 +58,12 @@ class CategoriesController extends Controller
         // $category->save();
 
         // Mass assignment
-        $category = Category::create( $request->all() );
+        $category = Category::create( $data );
 
         // PRG - Post Redirect Get + Flash Message
         return redirect()
             ->route('dashboard.categories.index')  // Redirest to this route
-            ->with('status', "Category ({$category->name}) Created!"); // Adds flash message
+            ->with('success', "Category ({$category->name}) Created!"); // Adds flash message
     }
 
     public function edit($id)
@@ -70,7 +79,7 @@ class CategoriesController extends Controller
                       ->orWhere('parent_id', '<>', $id);
             })
             ->orderBy('name')
-            ->get();
+            ->pluck('name', 'id');
         
         return view('dashboard.categories.edit', [
             'category' => $category,
@@ -78,17 +87,24 @@ class CategoriesController extends Controller
         ]);
     }
 
-    public function update(Request $request, $id)
+    public function update(CategoryRequest $request, $id)
     {
         $category = Category::findOrFail($id);
         // $category->name = $request->name;
         // $category->save();
 
-        $category->update( $request->all() );
+        //$data = $this->validateRequest($request, $id);
+        $data = $request->validated();
+        if (!$data['slug']) {
+            $data['slug'] = Str::slug($data['name']);
+        }
+        
+        $category->update( $data );
 
         return redirect()
             ->route('dashboard.categories.index')  // Redirest to this route
-            ->with('status', "Category ({$category->name}) Updated!");
+            ->with('success', "Category ({$category->name}) Updated!")
+            ->with('info', 'Category data changed!');
     }
 
     public function destroy($id)
@@ -101,6 +117,29 @@ class CategoriesController extends Controller
 
         return redirect()
             ->back()  // Redirest to this route
-            ->with('status', "Category Deleted!");
+            ->with('success', "Category Deleted!")
+            ->with('warning', 'You deleted a category');
+    }
+
+    protected function validateRequest(Request $request, $id = 0)
+    {
+        $rules = [
+            'name' => 'required|string|max:255',
+            'slug' => "nullable|string|unique:categories,slug,$id",
+            'parent_id' => 'nullable|int|exists:categories,id',
+            'image' => [
+                'nullable',
+                'image',
+                'max:200',
+                //'dimensions:min_width=300,min_height=300,max_width=800,max_height=300',
+                Rule::dimensions()->minWidth(300)->minHeight(300)->maxWidth(300)->maxHeight(300),
+            ]
+        ];
+        $messages = [
+            'required' => ':attribute is required!!',
+            'slug.required' => 'You must eneter a URL slug!',
+        ];
+
+        return $request->validate($rules, $messages);
     }
 }

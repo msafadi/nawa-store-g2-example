@@ -4,11 +4,13 @@
 
 @section('content')
 
-@if($status)
-<div class="alert alert-success">
-    {{ $status }}
-</div>
-@endif
+<x-flash-message />
+
+<x-alert type="info" />
+<x-alert type="success">
+    <h4>Alert Title</h4>
+    <p>Alert Message</p>
+</x-alert>
 
 <div class="mb-4">
     <a href="{{ route('dashboard.categories.create') }}" class="btn btn-outline-primary">
