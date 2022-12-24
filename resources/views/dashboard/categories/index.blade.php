@@ -6,21 +6,29 @@
 
 <x-flash-message />
 
-<x-alert type="info" />
-<x-alert type="success">
-    <h4>Alert Title</h4>
-    <p>Alert Message</p>
-</x-alert>
-
 <div class="mb-4">
     <a href="{{ route('dashboard.categories.create') }}" class="btn btn-outline-primary">
         <i class="fas fa-plus"></i> Add New</a>
+    <a href="{{ route('dashboard.categories.trash') }}" class="btn btn-outline-dark">
+        <i class="fas fa-trash"></i> View Trash</a>
 </div>
+
+<form action="{{ URL::current() }}" method="get" class="d-flex mb-5">
+    <div class="">
+        <x-form.input name="search" id="search" :value="request('search')" placeholder="Search..." />
+    </div>
+    <div class="ml-2">
+        <x-form.select name="p" id="p" :value="request('p')" :options="$parents" />
+    </div>
+    <div class="ml-2">
+        <button type="submit" class="btn btn-dark">Find</button>
+    </div>
+</form>
 
 <table class="table">
     <thead>
         <tr>
-            <th>ID</th>
+            <th></th>
             <th>Name</th>
             <th>Parent</th>
             <th>Created At</th>
@@ -32,7 +40,7 @@
     <tbody>
         @foreach($categories as $category)
         <tr>
-            <td>{{ $category->id }}</td>
+            <td><img class="img-fluid" src="{{ $category->image_url }}" width="80" alt=""></td>
             <td><strong>{{ $category->name }}</strong><br>
             <span class="text-muted">{{ $category->slug }}</span></td>
             <td>{{ $category->parent_name }}</td>

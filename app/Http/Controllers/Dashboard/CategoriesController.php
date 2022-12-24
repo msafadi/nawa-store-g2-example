@@ -7,12 +7,13 @@ use App\Http\Requests\CategoryRequest;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Str;
 
 class CategoriesController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         // SQL:
         // SELECT categories.*, parents.name as parent_name FROM categories
@@ -20,6 +21,8 @@ class CategoriesController extends Controller
 
         // Return Collection object (array)
         $categories = Category::query()
+            //->parent()
+            ->search($request->query())
             ->leftJoin('categories as parents', 'parents.id', '=', 'categories.parent_id')
             ->select([
                 'categories.*',
@@ -29,8 +32,11 @@ class CategoriesController extends Controller
             ->orderBy('categories.name', 'ASC')    
             ->get();
 
+        $parents = Category::pluck('name', 'id');
+
         return view('dashboard.categories.index', [
             'categories' => $categories,
+            'parents' => $parents,
         ]);
     }
 
@@ -51,6 +57,12 @@ class CategoriesController extends Controller
             $data['slug'] = Str::slug($data['name']);
         }
 
+        if ($request->hasFile('image')) {
+            $file = $request->file('image'); // return UploadedFile object
+            $path = $file->store('/media', 'public'); // store in public disk
+            $data['image_path'] = $path;
+        }
+
         // $category = new Category($request->all());
         // $category->name = $request->name;
         // $category->slug = $request->input('slug');
@@ -68,7 +80,6 @@ class CategoriesController extends Controller
 
     public function edit($id)
     {
-
         $category = Category::findOrFail($id);
         
         // SELECT * FROM categories WHERE
@@ -98,8 +109,24 @@ class CategoriesController extends Controller
         if (!$data['slug']) {
             $data['slug'] = Str::slug($data['name']);
         }
+
+        $old = false;
+        if ($request->hasFile('image')) {
+            $file = $request->file('image'); // return UploadedFile object
+            $path = $file->store('/media', 'public'); // store in public disk
+            // $file->getClientOriginalName();
+            // $file->getClientOriginalExtension();
+            // $file->getSize();
+            // $file->getMimeType(); // image/png
+            $data['image_path'] = $path;
+
+            $old = $category->image_path;
+        }
         
         $category->update( $data );
+        if ($old) {
+            Storage::disk('public')->delete($old);
+        }
 
         return redirect()
             ->route('dashboard.categories.index')  // Redirest to this route
@@ -110,10 +137,14 @@ class CategoriesController extends Controller
     public function destroy($id)
     {
         //Category::where('id', '=', $id)->delete();
-        Category::destroy($id);
+        //Category::destroy($id);
 
-        // $category = Category::findOrFail($id);
-        // $category->delete();
+        $category = Category::findOrFail($id);
+        $category->delete();
+
+        // if ($category->image_path) {
+        //     Storage::disk('public')->delete($category->image_path);
+        // }
 
         return redirect()
             ->back()  // Redirest to this route
@@ -132,7 +163,7 @@ class CategoriesController extends Controller
                 'image',
                 'max:200',
                 //'dimensions:min_width=300,min_height=300,max_width=800,max_height=300',
-                Rule::dimensions()->minWidth(300)->minHeight(300)->maxWidth(300)->maxHeight(300),
+                Rule::dimensions()->minWidth(300)->minHeight(300)->maxWidth(1400)->maxHeight(1400),
             ]
         ];
         $messages = [
@@ -142,4 +173,31 @@ class CategoriesController extends Controller
 
         return $request->validate($rules, $messages);
     }
+
+    public function trash()
+    {
+        $categories = Category::onlyTrashed()->get();
+        return view('dashboard.categories.trash', [
+            'categories' => $categories,
+        ]);
+    }
+
+    public function restore($id)
+    {
+        $category = Category::onlyTrashed()->findOrFail($id);
+        $category->restore();
+
+        return redirect()->route('dashboard.categories.index')
+            ->with('success', 'Caregory restored!');
+    }
+
+    public function forceDelete($id)
+    {
+        $category = Category::onlyTrashed()->findOrFail($id);
+        $category->forceDelete();
+
+        return redirect()->route('dashboard.categories.index')
+            ->with('success', 'Caregory deleted forever!');
+    }
+
 }
