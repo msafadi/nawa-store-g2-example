@@ -1,8 +1,7 @@
 <?php
 
-use App\Http\Controllers\Dashboard\CategoriesController;
-use App\Http\Controllers\Dashboard\ProductsController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -18,27 +17,21 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])
     ->name('home');
-// Route::view('/about-us', 'front.pages.about-us');
-// Route::view('/contact', 'front.pages.contact');
 
 Route::get('/pages/{name}', [HomeController::class, 'show'])
     ->name('pages');
 
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::group([
-    'prefix' => '/dashboard',
-    'as' => 'dashboard.'
-], function() {
-
-    Route::get('/categories/trash', [CategoriesController::class, 'trash'])
-        ->name('categories.trash');
-    Route::patch('/categories/{category}/restore', [CategoriesController::class, 'restore'])
-        ->name('categories.restore');
-    Route::delete('/categories/{category}/force', [CategoriesController::class, 'forceDelete'])
-        ->name('categories.force-delete');
-
-    Route::resources([
-        'categories' => CategoriesController::class,
-        'products' => ProductsController::class,
-    ]);
+Route::middleware(['auth'])->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])
+        //->middleware('password.confirm')
+        ->name('profile.destroy');
 });
+
+require __DIR__.'/auth.php';
+require __DIR__.'/dashboard.php';

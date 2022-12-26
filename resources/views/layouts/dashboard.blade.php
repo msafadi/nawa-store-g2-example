@@ -175,7 +175,11 @@ scratch. This page gets rid of all links and provides the needed markup only.
                         <img src="{{ asset('dashboard-assets/img/user2-160x160.jpg') }}" class="img-circle elevation-2" alt="User Image">
                     </div>
                     <div class="info">
-                        <a href="#" class="d-block">Alexander Pierce</a>
+                        <a href="{{ route('profile.edit') }}" class="d-block">{{ Auth::user()->name }}</a>
+                        <small class="text-muted">{{ Auth::user()->email }}</small>
+                        <div>
+                            <a id="logout-link" href="{{ route('logout') }}" class="text-danger">Logout</a>
+                        </div>
                     </div>
                 </div>
 
@@ -286,6 +290,10 @@ scratch. This page gets rid of all links and provides the needed markup only.
             <strong>Copyright &copy; {{ now()->year }} <a href="https://adminlte.io">{{ config('app.name') }}</a>.</strong> All rights reserved.
         </footer>
     </div>
+
+    <form id="logout-form" action="{{ route('logout') }}" method="post" class="d-none">
+        @csrf
+    </form>
     <!-- ./wrapper -->
 
     <!-- REQUIRED SCRIPTS -->
@@ -296,6 +304,13 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <script src="{{ asset('plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     <!-- AdminLTE App -->
     <script src="{{ asset('dashboard-assets/js/adminlte.min.js') }}"></script>
+
+    <script>
+        $('#logout-link').on('click', function(e) {
+            e.preventDefault();
+            $('#logout-form').submit();
+        });
+    </script>
 </body>
 
 </html>
