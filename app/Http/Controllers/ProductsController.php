@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\Product;
 use Illuminate\Http\Request;
 
 class ProductsController extends Controller
@@ -22,5 +23,13 @@ class ProductsController extends Controller
             'category' => $category,
             'products' => $products,
         ]);
+    }
+
+    public function show($id)
+    {
+        $product = Product::findOrFail($id);
+        foreach ($product->tags as $tag) {
+            echo $tag->name;
+        }
     }
 }

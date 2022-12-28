@@ -21,6 +21,19 @@ class Product extends Model
         return $this->belongsTo(Category::class, 'category_id', 'id');
     }
 
+    // Many-to-Many
+    public function tags()
+    {
+        return $this->belongsToMany(
+            Tag::class, 
+            'product_tag',
+            'product_id',
+            'tag_id',
+            'id',
+            'id'
+        );
+    }
+
     public function scopeActive(Builder $builder)
     {
         $builder->where('status', '=', 'active');
