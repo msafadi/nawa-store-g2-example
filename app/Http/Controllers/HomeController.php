@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\View;
 
@@ -34,9 +35,15 @@ class HomeController extends Controller
             ],
         ];
 
+        $categories = Category::orderBy('name')
+            ->with('children') // Eager load
+            ->whereNull('parent_id')
+            ->get();
+
         return view('front.index', [
             'title' => 'Shop Home',
             'slides' => $slides,
+            'categories' => $categories,
         ]);
     }
 

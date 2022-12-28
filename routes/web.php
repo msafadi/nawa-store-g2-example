@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -21,6 +22,9 @@ Route::get('/', [HomeController::class, 'index'])
 Route::get('/pages/{name}', [HomeController::class, 'show'])
     ->name('pages');
 
+Route::get('/products/category/{category_slug}', [ProductsController::class, 'index'])
+    ->name('products.category');
+
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
@@ -32,6 +36,7 @@ Route::middleware(['auth'])->group(function () {
         //->middleware('password.confirm')
         ->name('profile.destroy');
 });
+
 
 require __DIR__.'/auth.php';
 require __DIR__.'/dashboard.php';
