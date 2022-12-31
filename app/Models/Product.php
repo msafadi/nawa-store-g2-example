@@ -34,6 +34,18 @@ class Product extends Model
         );
     }
 
+    public function cart()
+    {
+        return $this->hasMany(Cart::class);
+    }
+
+    public function cartUsers()
+    {
+        return $this->belongsToMany(User::class, 'cart')
+            ->withPivot(['id', 'cookie_id', 'quantity', 'product_id'])
+            ->withTimestamps();
+    }
+
     public function scopeActive(Builder $builder)
     {
         $builder->where('status', '=', 'active');

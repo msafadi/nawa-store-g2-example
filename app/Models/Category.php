@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class Category extends Model
@@ -24,6 +25,12 @@ class Category extends Model
         // static::addGlobalScope('parent', function(Builder $query) {
         //     $query->whereNotNull('categories.parent_id');
         // });
+
+        static::forceDeleted(function($category) {
+            if ($category->image_path) {
+                Storage::disk('public')->delete($category->image_path);
+            }
+        });
     }
 
     // One-to-Many
