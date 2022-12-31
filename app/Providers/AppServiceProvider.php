@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
+use PayPalCheckoutSdk\Core\PayPalHttpClient;
+use PayPalCheckoutSdk\Core\SandboxEnvironment;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -31,6 +33,14 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(CartRepository::class, function($app) {
             $cookie_id = $app->make('cart.cookie_id');
             return new CartRepository($cookie_id, Auth::id());
+        });
+
+        $this->app->bind('paypal.client', function() {
+            $clientId = config('services.paypal.client_id');
+            $clientSecret = config('services.paypal.secret');
+
+            $environment = new SandboxEnvironment($clientId, $clientSecret);
+            return new PayPalHttpClient($environment);
         });
     }
 

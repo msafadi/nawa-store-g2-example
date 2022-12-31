@@ -3,6 +3,7 @@
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\PaymentsController;
 use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -36,9 +37,13 @@ Route::post('/cart', [CartController::class, 'store']);
 
 Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout');
 Route::post('/checkout', [CheckoutController::class, 'store']);
-Route::get('/payments/{order}', function () {
-    echo 'Order Created!';
-})->name('payments');
+
+Route::get('/payments/{order}', [PaymentsController::class, 'create'])->name('payments');
+
+Route::get('/payments/{order}/return', [PaymentsController::class, 'store'])
+    ->name('payments.return');
+Route::get('/payments/{order}/cancel', [PaymentsController::class, 'cancel'])
+    ->name('payments.cancel');
 
 Route::get('/dashboard', function () {
     return view('dashboard');

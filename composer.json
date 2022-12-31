@@ -10,6 +10,7 @@
         "laravel/framework": "^9.19",
         "laravel/sanctum": "^3.0",
         "laravel/tinker": "^2.7",
+        "paypal/paypal-checkout-sdk": "^1.0",
         "symfony/intl": "^6.2"
     },
     "require-dev": {
