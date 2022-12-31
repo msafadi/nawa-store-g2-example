@@ -36,6 +36,9 @@ Route::post('/cart', [CartController::class, 'store']);
 
 Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout');
 Route::post('/checkout', [CheckoutController::class, 'store']);
+Route::get('/payments/{order}', function () {
+    echo 'Order Created!';
+})->name('payments');
 
 Route::get('/dashboard', function () {
     return view('dashboard');

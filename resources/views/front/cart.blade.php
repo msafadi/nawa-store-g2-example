@@ -36,7 +36,7 @@
                     </div>
                 </div>
                 <!-- End Cart List Title -->
-                @foreach ($cart as $item)
+                @foreach ($cart->get() as $item)
                 <!-- Cart Single List list -->
                 <div class="cart-single-list">
                     <div class="row align-items-center">
@@ -90,10 +90,10 @@
                             <div class="col-lg-4 col-md-6 col-12">
                                 <div class="right">
                                     <ul>
-                                        <li>Cart Subtotal<span>{{ Money::format($total) }}</span></li>
+                                        <li>Cart Subtotal<span>{{ Money::format($cart->total()) }}</span></li>
                                         <li>Shipping<span>Free</span></li>
                                         <li>You Save<span>{{ Money::format(0) }}</span></li>
-                                        <li class="last">You Pay<span>{{ Money::format($total) }}</span></li>
+                                        <li class="last">You Pay<span>{{ Money::format($cart->total()) }}</span></li>
                                     </ul>
                                     <div class="button">
                                         <a href="{{ route('checkout') }}" class="btn">Checkout</a>

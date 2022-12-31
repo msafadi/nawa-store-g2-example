@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Repositories\CartRepository;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
@@ -24,6 +26,11 @@ class AppServiceProvider extends ServiceProvider
             }
     
             return $cookie_id;
+        });
+
+        $this->app->bind(CartRepository::class, function($app) {
+            $cookie_id = $app->make('cart.cookie_id');
+            return new CartRepository($cookie_id, Auth::id());
         });
     }
 
