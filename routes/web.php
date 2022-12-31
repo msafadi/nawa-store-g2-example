@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\CartController;
+use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\ProfileController;
@@ -24,6 +26,16 @@ Route::get('/pages/{name}', [HomeController::class, 'show'])
 
 Route::get('/products/category/{category_slug}', [ProductsController::class, 'index'])
     ->name('products.category');
+Route::get('/products', [ProductsController::class, 'index'])
+    ->name('products.index');
+Route::get('/products/{product_slug}', [ProductsController::class, 'show'])
+    ->name('products.show');
+
+Route::get('/cart', [CartController::class, 'index'])->name('cart');
+Route::post('/cart', [CartController::class, 'store']);
+
+Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout');
+Route::post('/checkout', [CheckoutController::class, 'store']);
 
 Route::get('/dashboard', function () {
     return view('dashboard');

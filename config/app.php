@@ -71,6 +71,8 @@ return [
 
     'timezone' => 'Asia/Gaza',
 
+    'currency' => 'ILS',
+
     /*
     |--------------------------------------------------------------------------
     | Application Locale Configuration
@@ -210,6 +212,7 @@ return [
 
     'aliases' => Facade::defaultAliases()->merge([
         // 'ExampleClass' => App\Example\ExampleClass::class,
+        'Money' => App\Helpers\Money::class,
     ])->toArray(),
 
 ];

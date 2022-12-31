@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class Product extends Model
 {
@@ -49,5 +50,21 @@ class Product extends Model
     public function scopeActive(Builder $builder)
     {
         $builder->where('status', '=', 'active');
+    }
+
+    public function getImageUrlAttribute()
+    {
+        if ($this->image_path) {
+            if (Str::startsWith($this->image_path, ['http://', 'https://'])) {
+                return $this->image_path;
+            }
+            return asset('storage/' . $this->image_path);
+        }
+        return asset('assets/images/default-thumbnail.jpg');
+    }
+
+    public function getUrlAttribute()
+    {
+        return route('products.show', $this->slug);
     }
 }

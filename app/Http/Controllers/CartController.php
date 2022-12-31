@@ -20,17 +20,23 @@ class CartController extends Controller
         $user_id = Auth::id();
         $cookie_id = App::make('cart.cookie_id');
 
-        return Cart::where('cookie_id', '=', $cookie_id)
+        return Cart::with('product')
+            ->where('cookie_id', '=', $cookie_id)
             ->when($user_id, function($builder, $user_id) {
                 $builder->where('user_id', '=', $user_id);
             });
     }
     public function index()
     {
-        $cart = $this->query()->get();
+        $cart = $this->query()->get(); // Collection
+
+        $total = $cart->sum(function($item) {
+            return $item->quantity * $item->product->price;
+        });
 
         return view('front.cart', [
             'cart' => $cart,
+            'total' => $total,
         ]);
     }
 
@@ -55,6 +61,10 @@ class CartController extends Controller
                 'product_id' => $request->post('product_id'),
                 'quantity' => $request->post('quantity', 1),
             ]);
+        }
+
+        if ($request->expectsJson()) {
+            return $cart;
         }
 
         return redirect()->back()
