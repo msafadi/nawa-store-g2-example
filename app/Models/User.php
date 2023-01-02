@@ -60,4 +60,14 @@ class User extends Authenticatable implements MustVerifyEmail
             ->withPivot(['id', 'cookie_id', 'quantity', 'user_id'])
             ->withTimestamps();
     }
+
+    public function receivesBroadcastNotificationsOn()
+    {
+        return 'Notifications.' . $this->id;
+    }
+
+    public function routeNotificationForMail($notification = null)
+    {
+        return $this->email;
+    }
 }

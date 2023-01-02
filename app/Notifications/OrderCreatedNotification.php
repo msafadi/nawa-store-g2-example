@@ -5,6 +5,7 @@ namespace App\Notifications;
 use App\Models\Order;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Messages\DatabaseMessage;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
@@ -34,7 +35,7 @@ class OrderCreatedNotification extends Notification
      */
     public function via($notifiable)
     {
-        return ['mail', 'database'];
+        return ['mail', 'database', 'broadcast'];
     }
 
     /**
@@ -57,6 +58,16 @@ class OrderCreatedNotification extends Notification
     public function toDatabase($notifiable)
     {
         return new DatabaseMessage([
+            'title' => 'New Order',
+            'body' => "A new order #{$this->order->id} created.",
+            'link' => route('dashboard.categories.index'),
+            'icon' => 'fas fa-envelope',
+        ]);
+    }
+
+    public function toBroadcast($notifiable)
+    {
+        return new BroadcastMessage([
             'title' => 'New Order',
             'body' => "A new order #{$this->order->id} created.",
             'link' => route('dashboard.categories.index'),

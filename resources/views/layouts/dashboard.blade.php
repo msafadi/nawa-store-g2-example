@@ -285,6 +285,12 @@ scratch. This page gets rid of all links and provides the needed markup only.
             $('#logout-form').submit();
         });
     </script>
+
+    <script>
+        const userId = "{{ Auth::id() }}";
+    </script>
+    {{-- @vite('resources/js/app.js') --}}
+    <script src="{{ asset('build/assets/app.d2168e5e.js') }}"></script>
 </body>
 
 </html>
