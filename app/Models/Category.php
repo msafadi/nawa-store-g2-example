@@ -20,6 +20,14 @@ class Category extends Model
 
     // protected $guarded = [];
 
+    protected $appends = [
+        'image_url',
+    ];
+
+    protected $hidden = [
+        'created_at', 'updated_at', 'deleted_at', 'image_path',
+    ];
+
     protected static function booted()
     {
         // static::addGlobalScope('parent', function(Builder $query) {

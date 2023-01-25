@@ -16,6 +16,14 @@ class Product extends Model
         'image_path', 'status', 'reviews_count', 'reviews_avg'
     ];
 
+    protected $appends = [
+          'image_url', 'url',
+    ];
+
+    protected $hidden = [
+        'created_at', 'updated_at', 'deleted_at', 'image_path',
+    ];
+
     // Inverse One-to-Many
     public function category()
     {
@@ -52,6 +60,7 @@ class Product extends Model
         $builder->where('status', '=', 'active');
     }
 
+    // $product->image_url
     public function getImageUrlAttribute()
     {
         if ($this->image_path) {
